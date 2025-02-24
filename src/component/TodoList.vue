@@ -1,9 +1,37 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-const a = ref('123')
-function ref2() {
-  a.value += '~';
-  console.log(a.value)
+const text = ref('123')
+// const b = ref(true) // 验证checkbox的双向绑定
+// function ref2() {   // 验证双向绑定v1
+//   text.value += '~';
+//   console.log(text.value)
+//   // b.value = !b.value;
+// }
+
+// const list = ref(['学习vue3', '学习java', '学习python'])
+const list2 = ref([
+  {
+    text: '学习vue3',
+    checked: false
+  },
+  {
+    text: '学习java',
+    checked: false
+  },
+  {
+    text: '学习python',
+    checked: false
+  }
+])
+
+function addTodo() {
+  list2.value.push({
+    text: text.value,
+    checked: false
+  })
+}
+function delTodo(index) {
+  list2.value.splice(index, 1)
 }
 </script>
 
@@ -11,21 +39,36 @@ function ref2() {
   <div class="todo-app">
     <div class="title">Todo App</div>
     <div class="todo-form">
-      <input v-model="a" class="todo-input" type="text" placeholder="请输入待办事项...">
-      <div @click="ref2" class="todo-button">添加</div>
+      <input v-model="text" class="todo-input" type="text" placeholder="请输入待办事项...">
+      <div @click="addTodo" class="todo-button">添加</div>
     </div>
 
-    <div class="todo-list">
+    <div v-for="(item, index) in list2" :key="index" :class="item.checked ? 'complete' : 'todo-list'">
       <div>
-        <input type="checkbox">
-        <span class="name">学习vue3</span>
+        <input v-model="item.checked" type="checkbox">
+        <span class="name">{{ item.name + index }}</span>
       </div>
-      <div class="del">del</div>
+      <div @click="delTodo" class="del">del</div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.complete {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+  height: 50px;
+  margin: 8px auto;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 20px;
+  text-decoration: line-through;
+  opacity: 0.4;
+}
+
 .todo-list {
   display: flex;
   align-items: center;
