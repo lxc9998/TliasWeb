@@ -1,18 +1,26 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+const a = ref('123')
+function ref2() {
+  a.value += '~';
+  console.log(a.value)
+}
+</script>
 
 <template>
   <div class="todo-app">
     <div class="title">Todo App</div>
     <div class="todo-form">
-      <input class="todo-input" type="text" placeholder="添加事项...">
-      <div class="todo-button">添加</div>
+      <input v-model="a" class="todo-input" type="text" placeholder="请输入待办事项...">
+      <div @click="ref2" class="todo-button">添加</div>
     </div>
 
     <div class="todo-list">
-      <div class="todo-item">
+      <div>
         <input type="checkbox">
-        <span>学习vue3</span>
+        <span class="name">学习vue3</span>
       </div>
+      <div class="del">del</div>
     </div>
   </div>
 </template>
@@ -21,6 +29,22 @@
 .todo-list {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 80%;
+  height: 50px;
+  margin: 8px auto;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 20px;
+}
+
+.name {
+  padding-left: 3px;
+}
+
+.del {
+  color: red;
 }
 
 .todo-form {
@@ -35,6 +59,7 @@
   height: 50px;
   border-radius: 20px 0 0 20px;
   padding-left: 15px;
+  margin-bottom: 20px;
 }
 
 .todo-button {
