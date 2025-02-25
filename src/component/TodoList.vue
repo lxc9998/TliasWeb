@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-const text = ref('123')
+const text = ref('')
 // const b = ref(true) // 验证checkbox的双向绑定
 // function ref2() {   // 验证双向绑定v1
 //   text.value += '~';
@@ -30,7 +30,7 @@ function addTodo() {
     checked: false
   })
 }
-function delTodo(index) {
+function delTodo(index: number) {
   list2.value.splice(index, 1)
 }
 </script>
@@ -46,9 +46,9 @@ function delTodo(index) {
     <div v-for="(item, index) in list2" :key="index" :class="item.checked ? 'complete' : 'todo-list'">
       <div>
         <input v-model="item.checked" type="checkbox">
-        <span class="name">{{ item.name + index }}</span>
+        <span class="name">{{ item.text + index }}</span>
       </div>
-      <div @click="delTodo" class="del">del</div>
+      <div @click="delTodo(index)" class="del">del</div>
     </div>
   </div>
 </template>
