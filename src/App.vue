@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import TodoList from "@/component/TodoList.vue";
 </script>
 
 <template>
-  <TodoList></TodoList>
+  <router-view></router-view>
 </template>
 
-<style scoped></style>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+</style>

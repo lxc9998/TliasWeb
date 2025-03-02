@@ -29,6 +29,7 @@ function addTodo() {
     text: text.value,
     checked: false
   })
+  text.value = ''
 }
 function delTodo(index: number) {
   list2.value.splice(index, 1)
@@ -123,10 +124,10 @@ function delTodo(index: number) {
   border-radius: 5px;
   width: 98%;
   height: 500px;
-  margin-left: 1%;
+  margin-left: auto;
   padding-top: 30px;
+  /* 添加padding虽然可以防止margin塌陷，但是尺寸变大了，需要更换尺寸计算方式  */
   box-sizing: border-box;
-  /* 防止padding撑开盒子  */
   margin-top: 40px;
 }
 
