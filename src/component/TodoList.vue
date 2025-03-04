@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 const text = ref('')
-// const b = ref(true) // 验证checkbox的双向绑定
-// function ref2() {   // 验证双向绑定v1
-//   text.value += '~';
-//   console.log(text.value)
-//   // b.value = !b.value;
-// }
-
-// const list = ref(['学习vue3', '学习java', '学习python'])
-const list2 = ref([
+const list = ref([
   {
     text: '学习vue3',
     checked: false
@@ -25,14 +17,14 @@ const list2 = ref([
 ])
 
 function addTodo() {
-  list2.value.push({
+  list.value.push({
     text: text.value,
     checked: false
   })
   text.value = ''
 }
 function delTodo(index: number) {
-  list2.value.splice(index, 1)
+  list.value.splice(index, 1)
 }
 </script>
 
@@ -44,7 +36,7 @@ function delTodo(index: number) {
       <div @click="addTodo" class="todo-button">添加</div>
     </div>
 
-    <div v-for="(item, index) in list2" :key="index" :class="item.checked ? 'complete' : 'todo-list'">
+    <div v-for="(item, index) in list" :key="index" :class="item.checked ? 'complete' : 'todo-list'">
       <div>
         <input v-model="item.checked" type="checkbox">
         <span class="name">{{ item.text + index }}</span>
@@ -120,8 +112,6 @@ function delTodo(index: number) {
 }
 
 .todo-app {
-  border: 2px solid red;
-  border-radius: 5px;
   width: 98%;
   height: 500px;
   margin-left: auto;

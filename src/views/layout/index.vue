@@ -1,19 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
-} from '@element-plus/icons-vue'
-
-const isCollapse = ref(true)
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
 </script>
 
 <template>
@@ -34,31 +19,38 @@ const handleClose = (key: string, keyPath: string[]) => {
       <!-- 侧边栏+主区域 -->
       <el-container>
         <el-aside width="200px" class="aside">
-          <el-menu>
+          <el-menu router>
             <!-- index可以设置为非数字，配合router属性使用 -->
-            <el-menu-item index="/index"><el-icon>
-                <HomeFilled />
-              </el-icon>首页</el-menu-item>
+            <el-menu-item index="/index"><el-icon><HomeFilled /></el-icon>首页</el-menu-item>
+              <!-- 班级管理菜单 -->
             <el-sub-menu index="/manage">
-              <template #title><el-icon>
-                  <message />
-                </el-icon>班级学员管理</template>
-              <el-menu-item index="class">班级管理</el-menu-item>
-              <el-menu-item index="stu">学员管理</el-menu-item>
-              <el-sub-menu index="1-4">
+              <template #title><el-icon><message /></el-icon>班级学员管理</template>
+              <el-menu-item index="/clazz"><el-icon><Menu /></el-icon> 班级管理</el-menu-item>
+              <el-menu-item index="/stu"><el-icon><HomeFilled /></el-icon>班级学员管理</el-menu-item>
+              <el-sub-menu index="/todo">
                 <template #title>待办列表</template>
-                <el-menu-item index="todolist">TodoList</el-menu-item>
+                <el-menu-item index="/todo">TodoList</el-menu-item>
               </el-sub-menu>
             </el-sub-menu>
-            <el-sub-menu index="/manage">
+            <!-- 系统信息管理 -->
+            <el-sub-menu index="/system">
               <template #title><el-icon><Tools/></el-icon>系统信息管理</template>
-              <el-menu-item index="1-1">部门管理</el-menu-item>
-              <el-menu-item index="1-2">员工管理</el-menu-item>
+              <el-menu-item index="/dept"><el-icon><HelpFilled /></el-icon>部门管理</el-menu-item>
+              <el-menu-item index="/emp"><el-icon><Avatar /></el-icon>员工管理</el-menu-item>
             </el-sub-menu>
+
+            <!-- 数据统计管理 -->
+            <el-sub-menu index="/report">
+              <template #title><el-icon><Histogram /></el-icon>数据统计管理</template>
+              <el-menu-item index="/empReport"><el-icon><InfoFilled /></el-icon>员工信息统计</el-menu-item>
+              <el-menu-item index="/stuReport"><el-icon><Share /></el-icon>学员信息统计</el-menu-item>
+              <el-menu-item index="/log"><el-icon><Document /></el-icon>日志信息统计</el-menu-item>
+            </el-sub-menu>
+
           </el-menu>
         </el-aside>
         <!-- 主区域 -->
-        <el-main>右侧核心区域</el-main>
+        <el-main><router-view></router-view></el-main>
       </el-container>
     </el-container>
   </div>

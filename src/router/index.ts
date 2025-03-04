@@ -1,13 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Layoutviews from '@/views/layout/index.vue'
+import IndexViews from '@/views/index/index.vue'
+import ClazzViews from '@/views/clazz/index.vue'
+import StuViews from '@/views/stu/index.vue'
 import TodoList from '@/component/TodoList.vue'
-import Layout from '@/layout/index.vue'
+import DeptViews from '@/views/dept/index.vue'
+import EmpViews from '@/views/emp/index.vue'
+import EmpReportViews from '@/views/report/emp/index.vue'
+import StuReportViews from '@/views/report/stu/index.vue'
+import LogViews from '@/views/log/index.vue'
+import LoginViews from '@/views/login/index.vue'
 
+const routes = [
+    { path: '/',
+      name: '',
+      component: Layoutviews,
+      redirect: '/index',
+      children: [
+        { path: '/index', name: 'index', component: IndexViews },
+        { path: '/clazz', name: 'clazz', component: ClazzViews },
+        { path: '/stu', name: 'stu', component: StuViews },
+        { path: '/todo', name: 'todo', component: TodoList },
+        { path: '/dept', name: 'dept', component: DeptViews },
+        { path: '/emp', name: 'emp', component: EmpViews },
+        { path: '/empReport', name: 'empReport', component: EmpReportViews },
+        { path: '/stuReport', name: 'stuReport', component: StuReportViews },
+        { path: '/log', name: 'log', component: LogViews },
+      ]
+    },
+    {path: '/login', name: 'login', component: LoginViews}
+]
 const router = createRouter({
   // 创建基于HTML5 history模式的路由实例
-  history: createWebHistory(import.meta.env.BASE_URL), // 使用项目基础路径作为路由的基础路径
-  routes: [
-    { path: '/todo', name: 'todo', component: TodoList },
-    { path: '/', name: 'layout', component: Layout }
-  ]
+  history: createWebHistory(),
+  routes,
 })
 export default router
