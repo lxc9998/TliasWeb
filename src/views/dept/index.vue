@@ -2,11 +2,12 @@
 import { onMounted, ref } from 'vue'
 import {queryAllApi} from '@/api/dept'
 
-let deptList = ref([])
+const deptList = ref([])
 
 const queryAll = async () =>{
   const result = await queryAllApi()
   deptList.value = result.data
+  console.log(deptList.value)
 }
 
 onMounted(()=>{
@@ -15,11 +16,11 @@ onMounted(()=>{
 </script>
 
 <template>
-  <el-table :data="deptList" style="width: 100%">
-    <el-table-column type="index" label="序号" width="180" />
-    <el-table-column prop="name" label="部门名称" width="180" />
-    <el-table-column prop="name" label="创建时间" width="180" />
-    <el-table-column prop="address" label="更新时间" width="180"  />
+  <el-table :data="deptList">
+    <el-table-column type="index" label="序号" />
+    <el-table-column prop="name" label="部门名称" />
+    <el-table-column prop="createTime" label="创建时间" />
+    <el-table-column prop="updateTime" label="更新时间"  />
   </el-table>
 </template>
 
