@@ -45,10 +45,10 @@ const openAddDeptDialog = () =>{
 // 新增部门请求
 const submitDept = async () =>{
   if(!deptFormRef.value) return;  // vue3中的ref会在组件挂载后才会被赋值,防止表单未渲染就调用.validate等方法报错
-  await deptFormRef.value.validate(async(valid)=>{
+  await deptFormRef.value.validate(async(valid)=>{  // 这里的await是等待表单校验通过后再执行后面的代码,防止在数据加载完成前用户进行其他操作
     if (valid) {  // 表单校验通过
       // 请求新增部门接口
-      const result = await addDeptApi(deptForm.value);  // deptForm.value目前就是一个对象:{name:'输入的部门名称'}
+      const result = await addDeptApi(deptForm.value);  // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
       if (result.code) {  // code提示:类型“AxiosResponse<any, any>”上不存在属性“code”先不管,不好解决
         ElMessage.success('新增部门：'+deptForm.value.deptName+' 成功！'); // 提示新增成功
       } else {  // 提示新增失败
