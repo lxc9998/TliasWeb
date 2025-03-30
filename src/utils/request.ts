@@ -19,7 +19,7 @@ request.interceptors.request.use(
 // 添加响应拦截器
 request.interceptors.response.use(
     (response) => {
-        return response.data    // 提取响应中的data（后端返回约定code、msg、data）
+        return response.data   // 提取响应中的data（后端返回约定code、msg、data）
     },
     (error)=>{
         return Promise.reject(error)
