@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import {queryAllApi,addDeptApi} from '@/api/dept'
+import {queryAllApi,addDeptApi,delDeptApi} from '@/api/dept'
 import { ElMessage } from 'element-plus'
 
 const deptList = ref([])
@@ -45,13 +45,13 @@ const openAddDeptDialog = () =>{
 // 新增部门请求
 const submitDept = async () =>{
   if(!deptFormRef.value) return;  // vue3中的ref会在组件挂载后才会被赋值,防止表单未渲染就调用.validate等方法报错
-  await deptFormRef.value.validate(async(valid)=>{  // 这里的await是等待表单校验通过后再执行后面的代码,防止在数据加载完成前用户进行其他操作
+  await deptFormRef.value.validate(async(valid)=>{  // 这里的await是等待表单校验通过后再执行后面的代码,防止在数据加载完成前用户进行其他操作.  飘红是因为validate方法没有被正确识别,先不管
     if (valid) {  // 表单校验通过
       // 请求新增部门接口
       const result = await addDeptApi(deptForm.value);  // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
-      if (result.code) {  // code提示:类型“AxiosResponse<any, any>”上不存在属性“code”先不管,不好解决
+      if (result.code) {  // 请求成功-新增成功  code提示:类型“AxiosResponse<any, any>”上不存在属性“code”先不管,不好解决
         ElMessage.success('新增部门：'+deptForm.value.deptName+' 成功！'); // 提示新增成功
-      } else {  // 提示新增失败
+      } else {  /// 请求成功-新增失败
         ElMessage.error('操作失败：'+result.msg);
       }
       showDialog.value = false; // 关闭对话框
@@ -65,8 +65,17 @@ const submitDept = async () =>{
 const editDept = (id:number) =>{
   console.log('部门id:', id)
 }
-const deleteDept = (id:number) =>{
-  console.log('部门id:',id)
+
+// 删除部门
+const deleteDept = async (deptId:number) =>{
+  // todo 二次确认弹对话框
+  const result = await delDeptApi(deptId);
+  if(result.code){
+    ElMessage.success('删除部门成功！');
+    await queryAll();
+  }else{
+    ElMessage.error('删除失败：'+result.msg);
+  }
 }
 
 onMounted(()=>{
@@ -77,6 +86,9 @@ onMounted(()=>{
 <template>
   <!-- 新增按钮 -->
   <el-button type="primary" @click="openAddDeptDialog">新增部门</el-button>
+
+  <!-- 二次确认对话框 -->
+
 
   <!-- 新增/编辑对话框 -->
   <el-dialog v-model="showDialog" :title="formTitle" width="500" :close-on-click-modal="false">
