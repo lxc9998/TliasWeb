@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import {queryAllApi,addDeptApi,delDeptApi} from '@/api/dept'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const deptList = ref([])
 
@@ -69,13 +69,19 @@ const editDept = (id:number) =>{
 // 删除部门
 const deleteDept = async (deptId:number) =>{
   // todo 二次确认弹对话框
-  const result = await delDeptApi(deptId);
-  if(result.code){
-    ElMessage.success('删除部门成功！');
-    await queryAll();
-  }else{
-    ElMessage.error('删除失败：'+result.msg);
-  }
+  ElMessageBox.confirm('确认删除该部门吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    const result = await delDeptApi(deptId);
+    if(result.code){
+      ElMessage.success('删除部门成功！');
+      await queryAll();
+    }else{
+      ElMessage.error('删除失败：'+result.msg);
+    }
+  })
 }
 
 onMounted(()=>{
@@ -90,11 +96,12 @@ onMounted(()=>{
   <!-- 二次确认对话框 -->
 
 
+
   <!-- 新增/编辑对话框 -->
   <el-dialog v-model="showDialog" :title="formTitle" width="500" :close-on-click-modal="false">
     <el-form :model="deptForm" :rules="rules" ref="deptFormRef">  <!-- :model="deptForm"表示这个表单的数据绑定到这个对象上; :rules="rules"表示将检验规则与该表单进行绑定-->
       <el-form-item label="部门名称" prop="deptName">  <!-- prop="deptName"表示使用rules中的deptName规则 -->
-        <el-input v-model="deptForm.deptName"/>  <!-- 注意要修改的是表单中的deptName字段,请求的时候要带这个字段,所以是双向绑定 -->
+        <el-input v-model="deptForm.deptName"/>  <!-- 注意要修改的是表单中的deptName字段,请求的时候要带这个字段,而编辑的时候又要回显这个字段,所以需要双向绑定 -->
       </el-form-item>
     </el-form>
     <template #footer>
