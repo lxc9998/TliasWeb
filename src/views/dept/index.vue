@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import {queryAllApi,addDeptApi,delDeptApi} from '@/api/dept'
+import {queryAllApi,addDeptApi,delDeptApi,getDeptInfoApi,updateDeptApi} from '@/api/dept'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const deptList = ref([])
@@ -11,12 +11,9 @@ const queryAll = async () =>{
   deptList.value = result.data
 }
 
-// 对话框是否显示
-const showDialog = ref(false) // 默认不显示对话框
-// 表单标题
-const formTitle = ref()
-// 表单数据
-const deptForm = ref({deptName:''})   // Element-plus中的model属性必须绑定为对象,哪怕只有一个string类型的属性
+const showDialog = ref(false) // // 对话框是否显示,默认不显示
+const formTitle = ref() // 表单标题
+const deptForm = ref({deptName:''})   // 表单数据Element-plus中的model属性必须绑定为对象,哪怕只有一个string类型的属性
 // 表单校验规则
 const rules = ref({
   deptName: [
@@ -28,27 +25,38 @@ const rules = ref({
 const deptFormRef = ref(null)
 
 
-// 打开新增部门对话框
-const openAddDeptDialog = () =>{
+// 打开新增/编辑部门对话框(复用对话框)
+const deptDialog = () =>{
   // 显示对话框
   showDialog.value = true
   // 清空表单数据
   deptForm.value = {deptName:''}
-  // 修改表单标题
-  formTitle.value = '新增部门'
   // 重置表单校验规则
   if (deptFormRef.value) {  // 如果表单已经渲染,则清空表单校验规则
     deptFormRef.value.resetFields()
   }
 }
 
-// 新增部门请求
+// 新增部门打开对话框
+const addDept = () => {
+  // 弹出对话框,修改标题
+  deptDialog()
+  formTitle.value = '新增部门'
+}
+
+// 新增/修改部门请求(复用逻辑)
 const submitDept = async () =>{
   if(!deptFormRef.value) return;  // vue3中的ref会在组件挂载后才会被赋值,防止表单未渲染就调用.validate等方法报错
-  await deptFormRef.value.validate(async(valid)=>{  // 这里的await是等待表单校验通过后再执行后面的代码,防止在数据加载完成前用户进行其他操作.  飘红是因为validate方法没有被正确识别,先不管
+  await deptFormRef.value.validate(async(valid)=>{  // 这里的await,是等待表单校验通过后,再执行后面的代码,防止在数据加载完成前用户进行其他操作.  飘红是因为validate方法没有被正确识别,先不管
     if (valid) {  // 表单校验通过
-      // 请求新增部门接口
-      const result = await addDeptApi(deptForm.value);  // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
+      // 判断是新增部门还是编辑部门
+      let result = null;
+      if(formTitle.value === '编辑部门'){
+        result = await updateDeptApi(deptForm.value)
+      }else{
+        // 请求新增部门接口
+        result = await addDeptApi(deptForm.value);  // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
+      }
       if (result.code) {  // 请求成功-新增成功  code提示:类型“AxiosResponse<any, any>”上不存在属性“code”先不管,不好解决
         ElMessage.success('新增部门：'+deptForm.value.deptName+' 成功！'); // 提示新增成功
       } else {  /// 请求成功-新增失败
@@ -62,13 +70,23 @@ const submitDept = async () =>{
   })
 }
 
-const editDept = (id:number) =>{
-  console.log('部门id:', id)
+// 编辑部门打开对话框
+const editDept = async (id:number) =>{
+  // 打开对话框,替换标题
+  deptDialog()
+  formTitle.value = '编辑部门'
+  // 回显数据-根据传入的id查询部门名称
+  const result = await getDeptInfoApi(id)
+  if(result.code){
+    deptForm.value = result.data
+  }else{
+    ElMessage.error('网络异常')
+  }
 }
 
 // 删除部门
 const deleteDept = async (deptId:number) =>{
-  // todo 二次确认弹对话框
+  // 二次确认弹对话框
   ElMessageBox.confirm('确认删除该部门吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -91,15 +109,10 @@ onMounted(()=>{
 
 <template>
   <!-- 新增按钮 -->
-  <el-button type="primary" @click="openAddDeptDialog">新增部门</el-button>
-
-  <!-- 二次确认对话框 -->
-
-
-
+  <el-button type="primary" @click="addDept">新增部门</el-button>
   <!-- 新增/编辑对话框 -->
   <el-dialog v-model="showDialog" :title="formTitle" width="500" :close-on-click-modal="false">
-    <el-form :model="deptForm" :rules="rules" ref="deptFormRef">  <!-- :model="deptForm"表示这个表单的数据绑定到这个对象上; :rules="rules"表示将检验规则与该表单进行绑定-->
+    <el-form :model="deptForm" :rules="rules" ref="deptFormRef">  <!-- :model="deptForm"表示这个表单的数据绑定到这个对象上; :rules="rules"表示将检验规则与该表单进行绑定; ref="deptFormRef"用来表示表单是否渲染完成再进行后续操作-->
       <el-form-item label="部门名称" prop="deptName">  <!-- prop="deptName"表示使用rules中的deptName规则 -->
         <el-input v-model="deptForm.deptName"/>  <!-- 注意要修改的是表单中的deptName字段,请求的时候要带这个字段,而编辑的时候又要回显这个字段,所以需要双向绑定 -->
       </el-form-item>
