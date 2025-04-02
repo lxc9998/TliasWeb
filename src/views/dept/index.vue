@@ -13,7 +13,7 @@ const queryAll = async () =>{
 
 const showDialog = ref(false) // // 对话框是否显示,默认不显示
 const formTitle = ref() // 表单标题
-const deptForm = ref({deptName:''})   // 表单数据Element-plus中的model属性必须绑定为对象,哪怕只有一个string类型的属性
+const deptForm = ref({deptName:'',id:0})   // 表单数据Element-plus中的model属性必须绑定为对象,哪怕只有一个string类型的属性
 // 表单校验规则
 const rules = ref({
   deptName: [
@@ -30,7 +30,7 @@ const deptDialog = () =>{
   // 显示对话框
   showDialog.value = true
   // 清空表单数据
-  deptForm.value = {deptName:''}
+  // deptForm.value = {deptName:''}
   // 重置表单校验规则
   if (deptFormRef.value) {  // 如果表单已经渲染,则清空表单校验规则
     deptFormRef.value.resetFields()
@@ -51,22 +51,19 @@ const submitDept = async () =>{
     if (valid) {  // 表单校验通过
       // 判断是新增部门还是编辑部门
       let result = null;
-      if(formTitle.value === '编辑部门'){
-        result = await updateDeptApi(deptForm.value)
-      }else{
-        // 请求新增部门接口
-        result = await addDeptApi(deptForm.value);  // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
-      }
+      !deptForm.value.id // 如果有id,则是编辑部门,否则是新增部门
+        ? result = await addDeptApi(deptForm.value) // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
+        : result = await updateDeptApi(deptForm.value)  
       if (result.code) {  // 请求成功-新增成功  code提示:类型“AxiosResponse<any, any>”上不存在属性“code”先不管,不好解决
-        ElMessage.success('新增部门：'+deptForm.value.deptName+' 成功！'); // 提示新增成功
+        ElMessage.success('操作成功！'); // 提示新增成功
       } else {  /// 请求成功-新增失败
         ElMessage.error('操作失败：'+result.msg);
       }
       showDialog.value = false; // 关闭对话框
-      await queryAll(); // 刷新部门列表
     }else{  // 表单校验不通过
       ElMessage.error('操作失败：请检查输入的部门名称是否符合要求！');
     }
+    await queryAll(); // 刷新部门列表
   })
 }
 
@@ -78,7 +75,8 @@ const editDept = async (id:number) =>{
   // 回显数据-根据传入的id查询部门名称
   const result = await getDeptInfoApi(id)
   if(result.code){
-    deptForm.value = result.data
+    deptForm.value.deptName = result.data
+    deptForm.value.id = id
   }else{
     ElMessage.error('网络异常')
   }
