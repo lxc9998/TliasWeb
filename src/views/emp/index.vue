@@ -37,6 +37,17 @@ const search = () =>{
 const clear = () =>{
   searchForm.value = {name:'',gender:'',date:[],begin:'',end:''}
 }
+
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(5)
+const background = ref(true)
+const handleSizeChange = (val: number) => {
+  console.log(`${val} items per page`)
+}
+const handleCurrentChange = (val: number) => {
+  console.log(`current page: ${val}`)
+}
 </script>
 
 <template>
@@ -61,7 +72,7 @@ const clear = () =>{
     </el-form-item>
   </el-form>
 
-  <!-- 员工列表1、列表新增选择框2、自定义模板3、v-if -->
+  <!-- 员工列表1、列表新增选择框2、自定义模板结合v-if3、居中展示字段内容 -->
   <el-table :data="empList" border style="width: 100%">
     <el-table-column type="selection" align="center"/>
     <el-table-column prop="name" label="姓名" align="center"/>
@@ -95,11 +106,26 @@ const clear = () =>{
       </template>
     </el-table-column>
   </el-table>
+
+  <!-- 分页 -->
+  <el-pagination class="demo-pagination-block"
+    v-model:current-page="currentPage"
+    v-model:page-size="pageSize"
+    :page-sizes="[5, 10, 20, 30, 40, 50, 100]"
+    :background="background"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="total"
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+  />
 </template>
+
 
 <style scoped>
 .demo-form-inline .el-select {
   --el-select-width: 120px;
 }
-
+.demo-pagination-block{
+  margin-top: 10px;
+}
 </style>
