@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 
+// 搜索区域
 const searchForm = ref({name:'',gender:'',date:[],begin:'',end:''}) // 新增两个要传给后端的字段
 
 watch(()=>searchForm.value.date,(newVal)=>{   // ()=>searchForm.value.date表示仅监听seachForm对象中date数组的变化
@@ -13,6 +14,16 @@ watch(()=>searchForm.value.date,(newVal)=>{   // ()=>searchForm.value.date表示
   }
 })
 
+const search = () =>{
+  console.log(searchForm.value);  // 1、可以看到date是一个数组,但给后端是两个date值,所以要用新的字段传给后端
+}
+
+const clear = () =>{
+  searchForm.value = {name:'',gender:'',date:[],begin:'',end:''}
+}
+
+
+// 员工列表区域
 const empList = ref([       
   {
     "id": 1,
@@ -30,14 +41,17 @@ const empList = ref([
   }]
 )
 
-const search = () =>{
-  console.log(searchForm.value);  // 1、可以看到date是一个数组,但给后端是两个date值,所以要用新的字段传给后端
+const jobMap : Record<number, string> = {   // 2、使用 Record 类型指定键和值的类型,避免类型警告
+  1: '班主任',
+  2: '讲师',
+  3: '学工主管',
+  4: '教研主管',
+  5: '咨询师'
 }
 
-const clear = () =>{
-  searchForm.value = {name:'',gender:'',date:[],begin:'',end:''}
-}
 
+
+// 分页区域
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(5)
@@ -89,12 +103,7 @@ const handleCurrentChange = (val: number) => {
     <el-table-column prop="deptName" label="所属部门" align="center"/>
     <el-table-column prop="job" label="职位" align="center">
       <template #default="scope">
-        <span v-if="scope.row.job == 1">班主任</span>
-        <span v-else-if="scope.row.job == 2">讲师</span>
-        <span v-else-if="scope.row.job == 3">学工主管</span>
-        <span v-else-if="scope.row.job == 4">教研主管</span>
-        <span v-else-if="scope.row.job == 5">咨询师</span>
-        <span v-else>其他</span>
+        <span>{{ jobMap[scope.row.job] || '其他' }}</span>    <!-- 1、使用映射对象直接渲染(模板中不要有太多的逻辑) -->
       </template>
     </el-table-column>
     <el-table-column prop="entryDate" label="入职日期" align="center"/>
