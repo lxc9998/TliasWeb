@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { getEmpListApi } from '@/api/emp';
+import { onMounted, ref, watch } from 'vue';
 
 // 搜索区域
 const searchForm = ref({name:'',gender:'',date:[],begin:'',end:''}) // 新增两个要传给后端的字段
@@ -14,9 +15,18 @@ watch(()=>searchForm.value.date,(newVal)=>{   // ()=>searchForm.value.date表示
   }
 })
 
-const search = () =>{
+// 查询员工列表
+const search = async () =>{
   console.log(searchForm.value);  // 1、可以看到date是一个数组,但给后端是两个date值,所以要用新的字段传给后端
+  const result = await getEmpListApi(pageNum.value,pageSize.value)  // ⚠️注意:直接用pageNum和pageSize是ref对象,需要通过.value获取ref对象的实际数值
+  if (result.code){
+    empList.value = result.data
+  }
 }
+
+onMounted(()=>{
+  search()
+})
 
 const clear = () =>{
   searchForm.value = {name:'',gender:'',date:[],begin:'',end:''}
@@ -24,7 +34,7 @@ const clear = () =>{
 
 
 // 员工列表区域
-const empList = ref([       
+const empList = ref([
   {
     "id": 1,
     "username": "jinyong",
@@ -49,15 +59,26 @@ const jobMap : Record<number, string> = {   // 2、使用 Record 类型指定键
   5: '咨询师'
 }
 
+// 编辑员工
+const editEmp = (empId:number) =>{
+  console.log('编辑员工'+empId);
+}
+// 删除员工
+const delEmp = () =>{
+  console.log('删除员工');
+}
+
 
 
 // 分页区域
 const total = ref(0)
-const currentPage = ref(1)
+const pageNum = ref(1)
 const pageSize = ref(5)
 const background = ref(true)
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
+
+const handleSizeChange = (pageSize: number) => {
+  console.log(`${pageSize} items per page`)
+  search()
 }
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
@@ -110,15 +131,15 @@ const handleCurrentChange = (val: number) => {
     <el-table-column prop="updateTime" label="最后操作时间" align="center"/>
     <el-table-column label="操作" align="center">
       <template #default="scope">
-        <el-button type="primary" size="mini" @click="">编辑</el-button>
-        <el-button type="danger" size="mini" @click="">删除</el-button>
+        <el-button type="primary" size="small" @click="editEmp(scope.row.id)">编辑</el-button>
+        <el-button type="danger" size="small" @click="delEmp()">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
 
-  <!-- 分页 -->
+  <!-- 分页区域 -->
   <el-pagination class="demo-pagination-block"
-    v-model:current-page="currentPage"
+    v-model:current-page="pageNum"
     v-model:page-size="pageSize"
     :page-sizes="[5, 10, 20, 30, 40, 50, 100]"
     :background="background"
