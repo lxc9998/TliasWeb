@@ -51,9 +51,11 @@ const submitDept = async () =>{
     if (valid) {  // 表单校验通过
       // 判断是新增部门还是编辑部门
       let result = null;
-      !deptForm.value.id // 如果有id,则是编辑部门,否则是新增部门
-        ? result = await addDeptApi(deptForm.value) // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
-        : result = await updateDeptApi(deptForm.value)  
+      if(!deptForm.value.id){ // 如果有id,则是编辑部门,否则是新增部门
+        result = await addDeptApi(deptForm.value) // deptForm.value目前就是一个对象:{name:'输入的部门名称'} 这里的await是等待请求成功再获取响应数据,这些await使得异步操作按顺序执行，代码逻辑更清晰
+      }else{
+        result = await updateDeptApi(deptForm.value)
+      }
       if (result.code) {  // 请求成功-新增成功  code提示:类型“AxiosResponse<any, any>”上不存在属性“code”先不管,不好解决
         ElMessage.success('操作成功！'); // 提示新增成功
       } else {  /// 请求成功-新增失败
